@@ -1,4 +1,7 @@
 const express = require ('express')
+const cors = require('cors')
+const fileUpload = require('express-fileupload');
+require("dotenv").config()
 
 const bodyParser= require('body-parser')
 
@@ -9,15 +12,15 @@ app.use(bodyParser.json());
 
 //Parse content type application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended:true}))
-
-
-app.get('/', (req, res) =>{
-res.json('Welcome to our node.js application');
-});
+app.use(cors())
+app.use(fileUpload({
+    useTempFiles: true
+}))
 
 require("./routes/product.route.js")(app);
 
-app.listen(5000, ()=>{
-    console.log("Nodejs backend application is running")
+const PORT = process.env.PORT || 6060
+app.listen(PORT, () => {
+    console.log(`App running on port: ${PORT}`)
 })
 

@@ -1,34 +1,33 @@
-const sql = require("./db.js");
+const db = require("./db.js");
 
 // Constructor
 const Product = function (product) {
   this.name = product.name;
-  this.amount = product.amount;
-  this.description = product.quantity;
+  this.price = product.price;
+  this.quantity = product.quantity
+  this.description = product.description;
   this.thumb = product.thumb;
 };
 
 // Insert
 Product.create = (newProduct, result) => {
-  sql.query("INSERT INTO products SET ?", newProduct, (err, res) => {
+  let sql = `INSERT INTO products SET ?`
+  db.query(sql, newProduct, (err, res) => {
     if (err) {
-      console.log("error:  ", err);
       result(err, null);
       return;
     }
-    console.log("product added: ", { id: res.name, ...newProduct });
-    result(null, { id: res.name, ...newProduct });
+    result(null, { result: res });
   });
 };
 
 Product.findById = (productId, result) => {
-  sql.query(`SELECT * FROM products WHERE _id =   ${productId}`, (err, res) => {
+  db.query(`SELECT * FROM products WHERE product_id =   ${productId}`, (err, res) => {
     if (err) {
       console.log("error:  ", err);
       result(err, null);
       return;
-    }
-
+}
     if (res.length) {
       console.log("Found Product: ", res[0]);
       result(null, res[0]);
@@ -38,21 +37,19 @@ Product.findById = (productId, result) => {
 };
 
 Product.getAll = (result) => {
-  sql.query(`SELECT * FROM products`, (err, res) => {
+  let sql = `SELECT * FROM products`
+  db.query(sql, (err, res) => {
     if (err) {
-      console.log("error:  ", err);
       result(err, null);
       return;
     }
-    console.log("products: ", res);
     result(null, res);
   });
 };
 
 Product.updateById = (productId, product, result) => {
-  sql.query(
-    `UPDATE products SET name=?, amount=?, quantity=?, thumb=? WHERE _id =? `,
-    [product.name, product.amount, product.available_stock, productId],
+  let sql = `UPDATE products SET name=?, amount=?, quantity=?, thumb=? WHERE _id =? `
+  db.query(sql, [product.name, product.price, product.quantity, productId],
     (err, res) => {
       if (err) {
         console.log("error:  ", err);
@@ -71,7 +68,8 @@ Product.updateById = (productId, product, result) => {
 };
 
 Product.remove = (productId, result) => {
-  sql.query(`DELETE FROM products WHERE _id =   ${productId}`, (err, res) => {
+  let sql = `DELETE FROM products WHERE product_id =   ${productId}`
+  db.query(sql, (err, res) => {
     if (err) {
       console.log("error:  ", err);
       result(err, null);
@@ -87,4 +85,16 @@ Product.remove = (productId, result) => {
   });
 };
 
-module.exports = Product;
+// Add Image thumb
+Product.createthumb = (newProduct, result) => {
+  let sql = `UPDATE products SET thumb = ${product.thumb} where product_id = ${productId}`
+  db.query(sql, newProduct, (err, res) => {
+    if (err) {
+      result(err, null);
+      return;
+    }
+    result(null, { result: res });
+  });
+};
+
+module.exports = Product

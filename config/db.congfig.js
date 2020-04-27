@@ -1,6 +1,6 @@
 module.exports = {
-    HOST: "localhost",
-    user: "root",
-    PASSWORD: "1234",
-    db: "shopman"
+    HOST: process.env.HOST,
+    user: process.env.user,
+    PASSWORD: process.env.PASSWORD,
+    db: process.env.db
 };

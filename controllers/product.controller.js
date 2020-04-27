@@ -10,11 +10,11 @@ exports.create = (req, res) => {
 
   const product = new Product({
     name: req.body.name,
-    amount: req.body.amount,
-    available_stock: req.body.quantity,
-    thumb: req.body.image
+    price: req.body.price,
+    quantity: req.body.quantity,
+    thumb: req.body.image,
+    description: req.body.description
   });
-  // console.log(product);
 
   Product.create(product, (err, data) => {
     if (err)
@@ -104,4 +104,36 @@ exports.delete = (req, res) => {
       }
     } else res.send({ message: `product was deleted successfully!` });
   });
+};
+
+
+// add image thumb
+exports.createthumb = (req, res) => {
+  // Validate Request
+  if (!req.body) {
+    res.status(400).send({ message: "Content can not be empty!" });
+  }
+  Product.createthumb(
+    req.params.productId,
+    new Product(req.body),
+    (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res
+            .status(404)
+            .send({
+              message: `Not found Product with id ${req.params.productId}.`,
+            });
+          return;
+        } else {
+          res
+            .status(500)
+            .send({
+              message: "Error updating product with id " + req.params.productId,
+            });
+          return;
+        }
+      } else res.send(data);
+    }
+  );
 };
