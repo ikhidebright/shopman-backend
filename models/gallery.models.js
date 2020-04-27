@@ -2,6 +2,7 @@ const db = require("./db.js");
 
 const Gallery = function (gallery) {
     this.image = gallery.image;
+    this.product_id = gallery.product_id;
   };
 
 // Add images to product gallery

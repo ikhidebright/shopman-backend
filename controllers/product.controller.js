@@ -1,4 +1,5 @@
 const Product = require("../models/product.model.js");
+const cloudinary = require("../config/cloudinary.config.js");
 
 exports.create = (req, res) => {
   // console.log(req.body);
@@ -106,34 +107,47 @@ exports.delete = (req, res) => {
   });
 };
 
-
 // add image thumb
 exports.createthumb = (req, res) => {
   // Validate Request
   if (!req.body) {
     res.status(400).send({ message: "Content can not be empty!" });
   }
-  Product.createthumb(
-    req.params.productId,
-    new Product(req.body),
-    (err, data) => {
-      if (err) {
-        if (err.kind === "not_found") {
-          res
-            .status(404)
-            .send({
-              message: `Not found Product with id ${req.params.productId}.`,
-            });
-          return;
-        } else {
-          res
-            .status(500)
-            .send({
-              message: "Error updating product with id " + req.params.productId,
-            });
-          return;
+  const file = req.files.image;
+  cloudinary.uploader.upload(file.tempFilePath, function (err, result) {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        message: "Upload error, try again"
+      })
+    } else {
+        const product = new Product({
+          thumb: result.url
+      });
+      Product.createthumb (
+        req.params.productId,
+        product,
+        (err, data) => {
+          if (err) {
+            console.log(err)
+            if (err.kind === "not_found") {
+              res
+                .status(404)
+                .send({
+                  message: `Not found Product with id ${req.params.productId}.`,
+                });
+              return;
+            } else {
+              res
+                .status(500)
+                .send({
+                  message: "Error updating product with id " + req.params.productId,
+                });
+              return;
+            }
+          } else res.send(data);
         }
-      } else res.send(data);
+      );  
     }
-  );
+})  
 };

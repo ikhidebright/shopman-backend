@@ -22,7 +22,7 @@ Product.create = (newProduct, result) => {
 };
 
 Product.findById = (productId, result) => {
-  db.query(`SELECT * FROM products WHERE product_id =   ${productId}`, (err, res) => {
+  db.query(`SELECT * FROM products WHERE product_id = ${productId}`, (err, res) => {
     if (err) {
       console.log("error:  ", err);
       result(err, null);
@@ -86,9 +86,9 @@ Product.remove = (productId, result) => {
 };
 
 // Add Image thumb
-Product.createthumb = (newProduct, result) => {
-  let sql = `UPDATE products SET thumb = ${product.thumb} where product_id = ${productId}`
-  db.query(sql, newProduct, (err, res) => {
+Product.createthumb = (productId, product, result) => {
+  let sql = `UPDATE products SET thumb = "${product.thumb}" where product_id = ${productId}`
+  db.query(sql, (err, res) => {
     if (err) {
       result(err, null);
       return;

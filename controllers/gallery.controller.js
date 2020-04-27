@@ -1,7 +1,6 @@
 const Gallery = require("../models/gallery.models.js");
 const cloudinary = require("../config/cloudinary.config.js");
 
-
   exports.create = (req, res) => {
     if (!req.body) {
       res.status(400).send({
