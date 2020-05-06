@@ -4,7 +4,7 @@ const cloudinary = require("../config/cloudinary.config.js");
 exports.create = (req, res) => {
   // console.log(req.body);
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "Form cannot be empty",
     });
   }
@@ -19,21 +19,21 @@ exports.create = (req, res) => {
 
   Product.create(product, (err, data) => {
     if (err)
-      res.status(500).send({
+    return res.status(500).send({
         message: err.message || "Some error occured while adding your products",
       });
-    else res.send(data);
+    else return res.send(data);
   });
 };
 
 exports.findAll = (req, res) => {
   Product.getAll((err, data) => {
     if (err)
-      res.status(500).send({
+    return res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving products.",
       });
-    else res.send(data);
+    else return res.send(data);
   });
 };
 

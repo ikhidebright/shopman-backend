@@ -5,7 +5,7 @@ const { sign } = require("jsonwebtoken")
 exports.register = (req, res) => {
   // console.log(req.body);
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "Form cannot be empty",
     });
   }
@@ -52,11 +52,11 @@ exports.register = (req, res) => {
 exports.findAll = (req, res) => {
     Customer.getAll((err, data) => {
     if (err)
-      res.status(500).send({
+    return res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving products.",
       });
-    else res.send(data);
+    else return res.send(data);
   });
 };
 
@@ -69,13 +69,13 @@ exports.login = (req, res) => {
     Customer.findByEmail(req.body.email, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res
+        return res
           .status(404)
           .send({
             message: `Not found customer with email ${customer.email}.`,
           });
       } else {
-        res
+        return res
           .status(500)
           .send({
             message: "Error retrieving customer with email " + customer.email,
@@ -84,7 +84,7 @@ exports.login = (req, res) => {
     } else {
         let token = sign({ user: data[0] }, process.env.SECRET, { expiresIn: 60 * 24 })
         console.log(token)
-        res
+        return res
         .header("auth-token", token)
         .send(data);
     }
@@ -94,49 +94,50 @@ exports.login = (req, res) => {
 exports.update = (req, res) => {
   // Validate Request
   if (!req.body) {
-    res.status(400).send({ message: "Content can not be empty!" });
+    return res.status(400).send({ message: "Content can not be empty!" });
   }
+
   Customer.updateById(
-    req.params.productId,
-    new Product(req.body),
+    req.params.customerId,
+    new Customer(req.body),
     (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
-          res
+          return res
             .status(404)
             .send({
-              message: `Not found Product with id ${req.params.productId}.`,
+              message: `Not found customer with id ${req.params.customerId}.`,
             });
           return;
         } else {
-          res
+          return res
             .status(500)
             .send({
-              message: "Error updating product with id " + req.params.productId,
+              message: "Error updating customer with id " + req.params.customerId,
             });
           return;
         }
-      } else res.send(data);
+      } else return res.send(data);
     }
   );
 };
 
 exports.delete = (req, res) => {
-    Customer.remove(req.params.productId, (err, data) => {
+    Customer.remove(req.params.customerId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res
+        return res
           .status(404)
           .send({
-            message: `Not found Product with id ${req.params.productId}.`,
+            message: `Not found customer with id ${req.params.customerId}.`,
           });
       } else {
-        res
+        return res
           .status(500)
           .send({
-            message: "Could not delete product with id " + req.params.productId,
+            message: "Could not delete customer with id " + req.params.customerId,
           });
       }
-    } else res.send({ message: `product was deleted successfully!` });
+    } else return res.send({ message: `customer was deleted successfully!` });
   });
 };

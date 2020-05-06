@@ -54,8 +54,8 @@ Customer.getAll = (result) => {
 };
 
 Customer.updateById = (customerId, customer, result) => {
-  let sql = `UPDATE customers SET first_name=?, last_name=?, phone=?, address=?, state=?, password=? WHERE customer_id =? `
-  db.query(sql, [customer.first_name, customer.last_name, customer.phone, customer.address, customer.state, customer.password, customerId],
+  let sql = `UPDATE customers SET first_name=?, last_name=?, email=?, phone=?, address=?, state=?, password=? WHERE id =? `
+  db.query(sql, [customer.first_name, customer.last_name, customer.email, customer.phone, customer.address, customer.state, customer.password, customerId],
     (err, res) => {
       if (err) {
         console.log("error:  ", err);
@@ -74,7 +74,7 @@ Customer.updateById = (customerId, customer, result) => {
 };
 
 Customer.remove = (customerId, result) => {
-  let sql = `DELETE FROM customers WHERE customer_id = ${customerId}`
+  let sql = `DELETE FROM customers WHERE id = '${customerId}'`
   db.query(sql, (err, res) => {
     if (err) {
       console.log("error:  ", err);

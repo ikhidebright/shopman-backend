@@ -3,7 +3,7 @@ const Reviews = require("../models/reviews.models.js");
 exports.create = (req, res) => {
     // console.log(req.body);
     if (!req.body) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Form cannot be empty",
       });
     }

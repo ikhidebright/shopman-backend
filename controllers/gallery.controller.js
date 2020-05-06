@@ -3,7 +3,7 @@ const cloudinary = require("../config/cloudinary.config.js");
 
   exports.create = (req, res) => {
     if (!req.body) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Form cannot be empty",
       });
     }
@@ -34,18 +34,18 @@ exports.delete = (req, res) => {
   Gallery.remove(req.params.productId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res
+        return res
           .status(404)
           .send({
             message: `Not found Product gallery with id ${req.params.productId}.`,
           });
       } else {
-        res
+        return res
           .status(500)
           .send({
             message: "Could not delete product gallery with id " + req.params.productId,
           });
       }
-    } else res.send({ message: `product gallery was deleted successfully!` });
+    } else return res.send({ message: `product gallery was deleted successfully!` });
   });
 };

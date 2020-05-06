@@ -1,12 +1,12 @@
 module.exports = (app) => {
     const user = require("../controllers/user.controller.js");
-    // Add a customer
+    // Register
     app.post("/user", user.register);
   
     //Retrive all customer
     app.get("/user", user.findAll);
   
-    // Retrieve one customer
+    // Login
     app.post("/login", user.login);
   
     // Edit customer

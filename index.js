@@ -19,6 +19,7 @@ app.use(fileUpload({
 
 require("./routes/product.route.js")(app);
 require("./routes/user.route.js")(app);
+require("./routes/order.route.js")(app);
 require("./routes/review.route.js")(app);
 
 const PORT = process.env.PORT || 6060
