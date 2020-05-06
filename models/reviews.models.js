@@ -29,8 +29,10 @@ Review.findById = (productId, result) => {
     if (res.length) {
       console.log("Found review for Product: ", res[0]);
       result(null, res[0]);
+      return
     }
     result({ kind: "not_found" }, null);
+    return
   });
 };
 

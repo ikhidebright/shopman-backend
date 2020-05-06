@@ -17,4 +17,24 @@ Gallery.create = (newGallery, result) => {
     });
   };
   
+
+  Gallery.remove = (productId, result) => {
+    let sql = `DELETE FROM gallery WHERE product_id =   ${productId}`
+    db.query(sql, (err, res) => {
+      if (err) {
+        console.log("error:  ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+      console.log("Deleted Product gallery: ");
+      result(null, res);
+    });
+};
+
+
 module.exports =  Gallery

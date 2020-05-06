@@ -19,6 +19,9 @@ module.exports = (app) => {
   
   // Add image to gallery
   app.post("/image", gallery.create);
+
+  // Delete gallery
+  app.delete("/image/:productId", gallery.delete);
   
   // update thumbnail
   app.put("/thumb/:productId", product.createthumb);

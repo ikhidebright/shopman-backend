@@ -29,3 +29,23 @@ const cloudinary = require("../config/cloudinary.config.js");
         }
     })
 };
+
+exports.delete = (req, res) => {
+  Gallery.remove(req.params.productId, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res
+          .status(404)
+          .send({
+            message: `Not found Product gallery with id ${req.params.productId}.`,
+          });
+      } else {
+        res
+          .status(500)
+          .send({
+            message: "Could not delete product gallery with id " + req.params.productId,
+          });
+      }
+    } else res.send({ message: `product gallery was deleted successfully!` });
+  });
+};
