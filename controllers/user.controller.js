@@ -2,6 +2,7 @@ const Customer = require("../models/user.models.js");
 const { genSaltSync, hashSync, compareSync } = require("bcryptjs")
 const { sign } = require("jsonwebtoken")
 const db = require("../models/db.js");
+const transporter = require('../config/Nodemailer.config.js')
 
 exports.register = (req, res) => {
   // console.log(req.body);
@@ -194,7 +195,11 @@ exports.updateAddress = (req, res) => {
           if (err) {
             console.log(err)
           } else {
-            return res.status(200).send(result)
+            return res.status(200).send({
+              result,
+              success: true,
+              message: "Address changed"
+            })
           }
       })
 };
@@ -233,6 +238,173 @@ exports.delete = (req, res) => {
     } else return res.send({ message: `customer was deleted successfully!` });
   });
 };
+
+exports.recover = (req, res) => {
+  try {
+    const { email } = req.body
+    let sql = `SELECT * FROM owners where email = '${email}'`
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.log(err)
+        } 
+        if (result.length < 1) {
+            return res.json({
+                success: false,
+                message: `Sorry an Account with Email: ${email} doesn't exist`
+            })
+        } else {
+            let secret = result[0].password;
+            const token = sign({ id: result[0].id }, secret, { expiresIn: 3600 // 1 hour 
+            });
+            let url = `http://localhost:8080/set/${result[0].id }-${ token }`
+            var mailOptions = {
+                from: 'ikhidebright@gmail.com',
+                to: email,
+                subject: 'FORGOT PASSWORD',
+                html: `Hello ${result[0].first_name} ${result[0].last_name}, 
+                <br>
+                <br>
+                There was a request to reset your password
+                <br>
+                <br>
+                Please click on the button below to get a new password
+                <br>
+                <br>
+                <a href='${url}'><button>Reset Password</button></a>
+                <br>
+                <br>
+                If you did not make this request, just ignore this email as nothing has changed.
+                <br>
+                <br>
+                Best Regards,
+                <br>
+                The Shopman Team!`
+              };
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    return res.status(402).json({
+                        success: false,
+                        message: "Failed to send e-mail reset Link"
+                    })
+                } else {
+                    return res.status(200).json({
+                        success: true,
+                        message: `A password reset link has been sent to ${email}`
+                    })
+                }
+              });
+        }
+    })
+  } catch (e) {
+      console.log(e)
+  }
+},
+
+exports.checkResetPasswordToken = (req, res) => {
+  try {
+      const { id, token } = req.params
+      let sql = `SELECT * from owners where id = ${id}`
+      db.query(sql , (err, result) => {
+          if (err) {
+              console.log(err)
+          } else {
+              let secret = result[0].password
+              verify(token, secret, function(err, decoded) {
+                if (err) {
+                    if (err.message === 'jwt expired') {
+                        return res.status(401).json({
+                            success: false,
+                            message: "Sorry the token associated with this Link has Expired"
+                        })
+                    } else if (err.message === 'invalid signature') {
+                        return res.status(401).json({
+                            success: false,
+                            message: "Sorry the token associated with this Link has an invalid signature"
+                        })
+                    }
+                }
+                if (decoded.id == id) {
+                    return res.status(200).json({
+                        success: true,
+                        id: decoded.id,
+                        decoded,
+                        message: "token decoded"
+                    })
+                } else {
+                    return res.status(401).json({
+                        success: false,
+                        message: "Sorry the token associated with this Link is Invalid"
+                    })
+                }
+              });
+          }
+      })
+  } catch (e) {
+    return res.status(500).json({
+        success: false,
+        error: e,
+        message: "Sorry an occured"
+    })
+  }
+},
+
+exports.ResetPasswordToken = (req, res) => {
+try {
+    const { id, token } = req.params
+    const { password } = req.body
+    let sql = `SELECT * from owners where id = ${id}`
+    db.query(sql , (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            let secret = result[0].password
+            verify(token, secret, function(err, decoded) {
+              if (err) {
+                  if (err.message === 'jwt expired') {
+                      return res.status(202).json({
+                          success: false,
+                          message: "Sorry the token associated with this Link has Expired"
+                      })
+                  } else if (err.message === 'invalid signature') {
+                      return res.status(202).json({
+                          success: false,
+                          message: "Sorry the token associated with this Link has an invalid signature"
+                      })
+                  }
+              }
+              if (decoded.id == id) {
+                let salt = genSaltSync(10)
+                let newPassword = hashSync(password, salt)
+                  let sql = `UPDATE owners set password = '${newPassword}' where id = ${id}`
+                  db.query(sql, (err, result) => {
+                      if (err) {
+                          console.log(err)
+                      } else {
+                          return res.status(200).json({
+                              success: true,
+                              result,
+                              decoded,
+                              message: "Password changed succesfully"
+                          })
+                      }
+                  })
+              } else {
+                  return res.status(401).json({
+                      success: false,
+                      message: "Sorry the token associated with this Link is Invalid"
+                  })
+              }
+            });
+        }
+    })
+} catch (e) {
+  return res.status(500).json({
+      success: false,
+      error: e,
+      message: "Sorry an occured"
+  })
+}
+},
 
 exports.autoLogin = (req, res, next) => {
   return res.send("Good")

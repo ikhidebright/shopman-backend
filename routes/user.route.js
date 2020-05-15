@@ -26,4 +26,13 @@ module.exports = (app) => {
     
     // updateAddress
     app.post("/updateaddress/:customerId", user.updateAddress);
+
+    // recover password
+    app.post('/recover', user.recover)
+
+    // check pass token
+    app.post('/checklostpasstoken/:id-:token', user.checkResetPasswordToken)
+
+    // reset pass token
+    app.post('/resetpasstoken/:id-:token', user.ResetPasswordToken)
   };
