@@ -10,8 +10,8 @@ exports.create = (req, res) => {
   }
 
   const cart = new Cart({
-  product_id: req.body.product_id,
-  total_price: req.body.total_price,
+  cart: req.body.cart,
+  customer_id: req.body.customer_id
   });
 
   Cart.create(cart, (err, data) => {
