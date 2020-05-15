@@ -41,6 +41,22 @@ Customer.findByEmail = (customerEmail, result) => {
     });
 };
 
+Customer.findById = (customerId, result) => {
+  db.query(`SELECT * FROM customers WHERE id = '${customerId}'`, (err, res) => {
+    if (err) {
+      console.log("error:  ", err);
+      result(err, null);
+      return;
+}
+    if (res.length) {
+      result(null, res[0]);
+      return;
+    }
+    result({ kind: "not_found" }, null);
+    return
+  });
+};
+
 Customer.getAll = (result) => {
   let sql = `SELECT * FROM customers`
   db.query(sql, (err, res) => {
@@ -69,6 +85,26 @@ Customer.updateById = (customerId, customer, result) => {
       }
       console.log("Updated customer: ");
       result(null, { customer_id: customerId, ...customer });
+    }
+  );
+};
+
+Customer.updatePassword = (customerId, password, result) => {
+  let sql = `UPDATE customers SET password=? WHERE id =? `
+  db.query(sql, [password, customerId],
+    (err, res) => {
+      if (err) {
+        console.log("error:  ", err);
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+      console.log("Updated customer: ");
+      result(null, { customer_id: customerId, ...password });
     }
   );
 };

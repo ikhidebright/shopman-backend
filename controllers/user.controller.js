@@ -1,6 +1,7 @@
 const Customer = require("../models/user.models.js");
 const { genSaltSync, hashSync, compareSync } = require("bcryptjs")
 const { sign } = require("jsonwebtoken")
+const db = require("../models/db.js");
 
 exports.register = (req, res) => {
   // console.log(req.body);
@@ -32,7 +33,12 @@ exports.register = (req, res) => {
       return res.status(500).send({
         message: err.message || "Some error occured while registering",
       });
-    else return res.send(data);
+    else return res
+    .status(200)
+    .send({
+      success: true,
+      data
+    });
   });
       } else {
         return res
@@ -42,8 +48,9 @@ exports.register = (req, res) => {
           });
       }
     } else return res
-    .status(500)
+    .status(201)
     .send({
+      email: true,
       message: "This email is already registered",
     });
   });
@@ -54,7 +61,7 @@ exports.findAll = (req, res) => {
     if (err)
     return res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving products.",
+          err.message || "Some error occurred while retrieving users.",
       });
     else return res.send(data);
   });
@@ -62,6 +69,13 @@ exports.findAll = (req, res) => {
 
 exports.login = (req, res) => {
 
+  if (!req.body) {
+    return res
+          .status(201)
+          .send({
+            message: `email cannot be empty`,
+          });
+  } else {
     const customer = new Customer({
         email: req.body.email
       });
@@ -70,7 +84,7 @@ exports.login = (req, res) => {
     if (err) {
       if (err.kind === "not_found") {
         return res
-          .status(404)
+          .status(201)
           .send({
             message: `Not found customer with email ${customer.email}.`,
           });
@@ -82,13 +96,26 @@ exports.login = (req, res) => {
           });
       }
     } else {
-        let token = sign({ user: data[0] }, process.env.SECRET, { expiresIn: 60 * 24 })
-        console.log(token)
+        let match = compareSync(req.body.password, data.password)
+        if (match) {
+        let token = sign({ user: data }, process.env.SECRET, { expiresIn: 60 * 24 })
         return res
-        .header("auth-token", token)
-        .send(data);
+        .header("Authorization", token)
+        .cookie("auth-token", token)
+        .send({
+          success: true,
+          data,
+          token
+        });
+        } else {
+          return res
+          .send({
+           message: "Invalid email or password",
+        });
+        }
     }
   });
+  }
 };
 
 exports.update = (req, res) => {
@@ -122,6 +149,71 @@ exports.update = (req, res) => {
   );
 };
 
+exports.updatePassword = (req, res) => {
+  // Validate Request
+  if (!req.body) {
+    return res.status(400).send({ message: "Content can not be empty!" });
+  }
+  let checkuser = `SELECT * FROM customers WHERE id = '${req.params.customerId}'`
+  db.query(checkuser, (err, result) => {
+    if (err) {
+      console.log(err)
+    }
+    if (result.length > 0) {
+      let match = compareSync(req.body.password, result[0].password)
+      if (match) {
+        let salt = genSaltSync(10)
+        let password = hashSync(req.body.newpassword, salt)
+        let updatepassword = `UPDATE customers SET password='${password}' WHERE id = '${req.params.customerId}'`
+        db.query(updatepassword, (err, result) => {
+          if (err) {
+            console.log(err)
+          } else {
+            return res.status(200).send({
+              result,
+              message: "Password changed"
+            })
+          }
+        })
+      } else {
+        return res.status(201).send({
+          message: "Incorrect Current Password"
+        })
+      }
+    }
+  })
+};
+
+exports.updateAddress = (req, res) => {
+  // Validate Request
+  if (!req.body) {
+    return res.status(400).send({ message: "Content can not be empty!" });
+  }
+        let updatepassword = `UPDATE customers SET address='${req.body.address}' WHERE id = '${req.params.customerId}'`
+        db.query(updatepassword, (err, result) => {
+          if (err) {
+            console.log(err)
+          } else {
+            return res.status(200).send(result)
+          }
+      })
+};
+
+exports.cart = (req, res) => {
+  // Validate Request
+  if (!req.body) {
+    return res.status(400).send({ message: "Content can not be empty!" });
+  }
+        let updatepassword = `INSERT INTO cart SET item='${req.body.cart}' WHERE customer_id = '${req.params.customerId}'`
+        db.query(updatepassword, (err, result) => {
+          if (err) {
+            console.log(err)
+          } else {
+            return res.status(200).send(result)
+          }
+      })
+};
+
 exports.delete = (req, res) => {
     Customer.remove(req.params.customerId, (err, data) => {
     if (err) {
@@ -141,3 +233,7 @@ exports.delete = (req, res) => {
     } else return res.send({ message: `customer was deleted successfully!` });
   });
 };
+
+exports.autoLogin = (req, res, next) => {
+  return res.send("Good")
+}
