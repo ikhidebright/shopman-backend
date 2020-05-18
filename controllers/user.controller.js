@@ -12,6 +12,8 @@ exports.register = (req, res) => {
     });
   }
 
+  let body = req.body
+
   const customer = new Customer({
     first_name: req.body.first_name,
     last_name: req.body.last_name,
@@ -34,12 +36,26 @@ exports.register = (req, res) => {
       return res.status(500).send({
         message: err.message || "Some error occured while registering",
       });
-    else return res
-    .status(200)
-    .send({
-      success: true,
-      data
-    });
+    else {
+      let user = {
+        id: data.result.insertId,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        email: body.email,
+        phone: body.phone,
+      }
+      let token = sign({ user: user }, process.env.SECRET, { expiresIn: 60 * 24 })
+      return res
+      .header("Authorization", token)
+      .cookie("auth-token", token)
+      .status(200)
+      .send({
+        success: true,
+        token,
+        data,
+        user
+      })
+    }
   });
       } else {
         return res
@@ -242,7 +258,7 @@ exports.delete = (req, res) => {
 exports.recover = (req, res) => {
   try {
     const { email } = req.body
-    let sql = `SELECT * FROM owners where email = '${email}'`
+    let sql = `SELECT * FROM customers where email = '${email}'`
     db.query(sql, (err, result) => {
         if (err) {
             console.log(err)
@@ -303,7 +319,7 @@ exports.recover = (req, res) => {
 exports.checkResetPasswordToken = (req, res) => {
   try {
       const { id, token } = req.params
-      let sql = `SELECT * from owners where id = ${id}`
+      let sql = `SELECT * from customers where id = ${id}`
       db.query(sql , (err, result) => {
           if (err) {
               console.log(err)
@@ -352,7 +368,7 @@ exports.ResetPasswordToken = (req, res) => {
 try {
     const { id, token } = req.params
     const { password } = req.body
-    let sql = `SELECT * from owners where id = ${id}`
+    let sql = `SELECT * from customers where id = ${id}`
     db.query(sql , (err, result) => {
         if (err) {
             console.log(err)
@@ -375,7 +391,7 @@ try {
               if (decoded.id == id) {
                 let salt = genSaltSync(10)
                 let newPassword = hashSync(password, salt)
-                  let sql = `UPDATE owners set password = '${newPassword}' where id = ${id}`
+                  let sql = `UPDATE customers set password = '${newPassword}' where id = ${id}`
                   db.query(sql, (err, result) => {
                       if (err) {
                           console.log(err)
@@ -401,7 +417,7 @@ try {
   return res.status(500).json({
       success: false,
       error: e,
-      message: "Sorry an occured"
+      message: "Sorry an Error occured"
   })
 }
 },

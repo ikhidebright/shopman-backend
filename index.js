@@ -24,6 +24,7 @@ require("./routes/user.route.js")(app);
 require("./routes/order.route.js")(app);
 require("./routes/cart.route.js")(app);
 require("./routes/review.route.js")(app);
+require("./routes/wishlist.route.js")(app);
 
 const PORT = process.env.PORT || 6060
 app.listen(PORT, () => {
