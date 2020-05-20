@@ -31,10 +31,30 @@ Product.findById = (productId, result) => {
     if (res.length) {
       console.log("Found Product: ", res[0]);
       result(null, res[0]);
+      return;
     }
     result({ kind: "not_found" }, null);
+    return;
   });
 };
+
+Product.findByCategory = (category, result) => {
+  db.query(`SELECT * FROM products WHERE category = '${category}'`, (err, res) => {
+    if (err) {
+      console.log("error:  ", err);
+      result(err, null);
+      return;
+}
+    if (res.length) {
+      console.log("Found Product: ", res[0]);
+      result(null, res[0]);
+      return;
+    }
+    result({ kind: "not_found" }, null);
+    return;
+  });
+};
+
 
 Product.getAll = (result) => {
   let sql = `SELECT * FROM products`

@@ -2,6 +2,7 @@ const verifyToken = require("../middlewares/verifyAuth")
 
 module.exports = (app) => {
     const user = require("../controllers/user.controller.js");
+
     // Register
     app.post("/user", user.register);
   
@@ -25,7 +26,7 @@ module.exports = (app) => {
     app.post("/updatepassword/:customerId", user.updatePassword);
     
     // updateAddress
-    app.post("/updateaddress/:customerId", user.updateAddress);
+    app.put("/updateaddress/:customerId", user.updateAddress);
 
     // recover password
     app.post('/recover', user.recover)

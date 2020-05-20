@@ -41,19 +41,39 @@ exports.findOne = (req, res) => {
   Product.findById(req.params.productId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res
+        return res
           .status(404)
           .send({
             message: `Not found product with id ${req.params.productId}.`,
           });
       } else {
-        res
+        return res
           .status(500)
           .send({
             message: "Error retrieving product with id " + req.params.productId,
           });
       }
-    } else res.send(data);
+    } else return res.send(data);
+  });
+};
+
+exports.category = (req, res) => {
+  Product.findByCategory(req.params.category, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        return res
+          .status(404)
+          .send({
+            message: `Not found product with id ${req.params.category}.`,
+          });
+      } else {
+        return res
+          .status(500)
+          .send({
+            message: "Error retrieving product with id " + req.params.category,
+          });
+      }
+    } else return res.send(data);
   });
 };
 

@@ -25,4 +25,8 @@ module.exports = (app) => {
   
   // update thumbnail
   app.put("/thumb/:productId", product.createthumb);
+
+  // findBy category
+  app.get("/product/:category", product.category);
+  
 };

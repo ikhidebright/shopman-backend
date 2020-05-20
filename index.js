@@ -11,9 +11,25 @@ const app = express()
 //Parse requset of content type application/json
 app.use(bodyParser.json());
 
+const corsOptions = {
+    origin: 'http://localhost:8080',
+    methods: ["POST", "PATCH", "PUT"],
+    credentials: true,
+    maxAge: 3600
+};
+
+
+app.use(function(req, response, next) {
+    response.setHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+     response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,PATCH");
+     response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+     next();
+    });
+    
+app.use(cors(corsOptions))
 //Parse content type application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended:true}))
-app.use(cors())
 app.use(cookieparser())
 app.use(fileUpload({
     useTempFiles: true
