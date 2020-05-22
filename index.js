@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 const corsOptions = {
     origin: 'http://localhost:8080',
     methods: ["POST", "PATCH", "PUT"],
-    credentials: true,
+    // credentials: true,
     maxAge: 3600
 };
 
