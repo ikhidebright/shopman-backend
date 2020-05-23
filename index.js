@@ -12,12 +12,11 @@ const app = express()
 app.use(bodyParser.json());
 
 const corsOptions = {
-    origin: 'https://shopman.netlify.app',
+    origin: ['https://shopman.netlify.app', 'http://localhost:8080'],
     methods: ["POST", "PATCH", "PUT"],
     // credentials: true,
     maxAge: 3600
 };
-
 
 app.use(function(req, response, next) {
     response.setHeader("Access-Control-Allow-Origin", "https://shopman.netlify.app");
