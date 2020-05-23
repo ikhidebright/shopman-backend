@@ -7,6 +7,7 @@ const Product = function (product) {
   this.quantity = product.quantity
   this.description = product.description;
   this.thumb = product.thumb;
+  this.category = product.category;
 };
 
 // Insert

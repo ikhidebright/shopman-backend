@@ -14,7 +14,8 @@ exports.create = (req, res) => {
     price: req.body.price,
     quantity: req.body.quantity,
     thumb: req.body.image,
-    description: req.body.description
+    description: req.body.description,
+    category: req.body.category
   });
 
   Product.create(product, (err, data) => {
