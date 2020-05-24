@@ -47,8 +47,8 @@ Product.findByCategory = (category, result) => {
       return;
 }
     if (res.length) {
-      console.log("Found Product: ", res[0]);
-      result(null, res[0]);
+      console.log("Found Product: ", res);
+      result(null, res);
       return;
     }
     result({ kind: "not_found" }, null);
