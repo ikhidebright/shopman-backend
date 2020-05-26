@@ -28,5 +28,7 @@ module.exports = (app) => {
 
   // findBy category
   app.get("/product/:category", product.category);
-  
+
+  // search products
+  app.get("/product/:search", product.searchproducts);
 };

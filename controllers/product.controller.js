@@ -172,3 +172,18 @@ exports.createthumb = (req, res) => {
     }
 })  
 };
+
+// search products
+exports.searchproducts = async (req, res, next) => {
+  try {
+  let sql = `SELECT * FROM products WHERE name like '%${req.params.search}%' || category like '%${req.params.search}%'`;
+  db.query(sql, (err, results) => {
+      if(err) {
+     return res.status(500).json({message: "Sorry an error occured... try again"});
+      }
+      return res.status(200).json({result: results})
+  })
+} catch (error) {
+  console.log(error)
+ }
+}
