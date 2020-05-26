@@ -1,5 +1,6 @@
 const Product = require("../models/product.model.js");
 const cloudinary = require("../config/cloudinary.config.js");
+const db = require("../models/db");
 
 exports.create = (req, res) => {
   // console.log(req.body);
