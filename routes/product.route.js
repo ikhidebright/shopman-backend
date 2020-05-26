@@ -30,5 +30,5 @@ module.exports = (app) => {
   app.get("/product/:category", product.category);
 
   // search products
-  app.get("/product/:search", product.searchproducts);
+  app.get("/search/:search", product.searchproducts);
 };
